@@ -1,0 +1,12 @@
+out.yml
+node_modules/
+src/node_modules
+dist
+src/test_dist
+terraform/.terraform/
+src/app/ynab_tester.js
+samconfig.toml
+.aws-sam/
+test.js
+tests/
+.github/

@@ -1,0 +1,19 @@
+{
+  "name": "ynasb-serverless",
+  "scripts": {
+    "build": "babel ./app -d ./dist;",
+    "test": "babel ./app -d ./test_dist; node inspect test_dist/ynab_tester.js; rm -rf ./test_dist"
+  },
+  "version": "1.0.0",
+  "private": true,
+  "devDependencies": {
+    "aws-sdk": "2.631.0"
+  },
+  "dependencies": {
+    "@slack/web-api": "^5.11.0",
+    "babel-preset-env": "^1.7.0",
+    "lodash": "^4.17.20",
+    "moment": "^2.27.0",
+    "ynab": "^1.20.0"
+  }
+}

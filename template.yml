@@ -1,0 +1,66 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: An AWS Lambda application for YNASB Serverless.
+Resources:
+  api:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: api
+      TracingEnabled: true
+      OpenApiVersion: 3.0.2
+  function:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: dist/index.handler
+      Runtime: nodejs12.x
+      CodeUri: src/
+      Description: Lambda function for YNASB Serverless
+      Timeout: 20
+      Environment:
+        Variables:
+          YNABApiKeyArn: !Ref YNABApiKey
+          SlackAuthTokenArn: !Ref SlackAuthToken
+          SlackVerificationTokenArn: !Ref SlackVerificationToken
+          DesiredCategories: ""
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Statement:
+            - Effect: Allow
+              Action: "secretsmanager:GetSecretValue"
+              Resource: !Ref YNABApiKey
+            - Effect: Allow
+              Action: "secretsmanager:GetSecretValue"
+              Resource: !Ref SlackAuthToken
+            - Effect: Allow
+              Action: "secretsmanager:GetSecretValue"
+              Resource: !Ref SlackVerificationToken
+      Tracing: Active
+      Events:
+        postEndpoint:
+          Type: Api
+          Properties:
+            RestApiId: !Ref api
+            Path: /ynasb
+            Method: POST
+        dailyBudgetAlert:
+          Type: Schedule
+          Properties:
+            Name: "DailyYNABBudgetAlert"
+            Schedule: "cron(0 15 ? * MON-FRI *)"
+        dailyNetworthAlert:
+          Type: Schedule
+          Properties:
+            Name: "DailyYNABNetworthAlert"
+            Schedule: "cron(0 20 ? * MON-FRI *)"
+  YNABApiKey:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: YNABApiKey
+  SlackAuthToken:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: SlackAuthToken
+  SlackVerificationToken:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: SlackVerificationToken
